@@ -137,10 +137,14 @@ namespace dae
 			{
 				case LightType::Directional:
 					return light.color * light.intensity;
+					break;
 				case LightType::Point:
 					return light.color * (light.intensity /
 						Vector3::Dot((light.origin - target), (light.origin - target)));
-				default: return{};
+					break;
+				default: 
+					return{};
+					break;
 			}
 			return {};
 		}

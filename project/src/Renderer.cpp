@@ -205,8 +205,6 @@ void Renderer::Render(Scene* pScene) const
 
 			if (closestHit.didHit)
 			{
-				finalColor = materials[closestHit.materialIndex]->Shade();
-
 				for (int i{ 0 }; i < lights.size(); ++i)
 				{
 					const Light CURRENT_LIGHT{ lights[i] };
@@ -215,16 +213,15 @@ void Renderer::Render(Scene* pScene) const
 					Ray shadowRay{ closestHit.origin, LIGHT_DIRECTION.Normalized(), 0.0001f, length };
 
 					if (!pScene->DoesHit(shadowRay)) {
-						Vector3 HIT_TO_CAMERA_DIRECTION = (closestHit.origin, camera.origin).Normalized();
-
 						const float ANGLE_BETWEEN = Vector3::Dot(closestHit.normal, LIGHT_DIRECTION.Normalized());
-						const ColorRGB BRDF = materials[closestHit.materialIndex]->Shade(closestHit, LIGHT_DIRECTION.Normalized(), HIT_TO_CAMERA_DIRECTION);
 
 						if (ANGLE_BETWEEN >= 0.0f) {
+							Vector3 HIT_TO_CAMERA_DIRECTION = (closestHit.origin, camera.origin).Normalized();
+
 							const ColorRGB LIGHT_RADIANCE = LightUtils::GetRadiance(CURRENT_LIGHT, closestHit.origin);
+							const ColorRGB BRDF = materials[closestHit.materialIndex]->Shade(closestHit, LIGHT_DIRECTION.Normalized(), HIT_TO_CAMERA_DIRECTION);
 							
-							finalColor += BRDF
-								* LIGHT_RADIANCE * ANGLE_BETWEEN;
+							finalColor += BRDF * LIGHT_RADIANCE * ANGLE_BETWEEN;
 						}
 					}
 				}
