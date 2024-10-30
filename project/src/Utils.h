@@ -20,21 +20,16 @@ namespace dae
 
 			if (D <= 0.f)
 			{
-				return false;
-			}
-
-			const float NormDiscriminant = sqrt(D);
-
-			const float t0 = (-B - NormDiscriminant) / (2 * A);
-			const float t1 = (-B + NormDiscriminant) / (2 * A);
-
-			if (t0 < ray.min || t0 >= ray.max)
-			{
 				hitRecord.didHit = false;
 				return false;
 			}
 
-			if (t1 < ray.min || t1 >= ray.max)
+			const float NormDiscriminant = sqrtf(D);
+
+			float t = (-B - NormDiscriminant) / (2 * A);
+			if (t < ray.min) t = (-B + NormDiscriminant) / (2 * A);
+
+			if (t < ray.min || t >= ray.max)
 			{
 				hitRecord.didHit = false;
 				return false;
@@ -42,12 +37,10 @@ namespace dae
 
 			if (!ignoreHitRecord)
 			{
-				float closestT{ t0 < t1 ? t0 : t1 };
-
 				hitRecord.didHit = true;
-				hitRecord.t = closestT;
+				hitRecord.t = t;
 				hitRecord.materialIndex = sphere.materialIndex;
-				hitRecord.origin = ray.origin + closestT * ray.direction;
+				hitRecord.origin = ray.origin + t * ray.direction;
 				hitRecord.normal = Vector3{ hitRecord.origin - sphere.origin}.Normalized();
 			}
 			return true;
@@ -140,8 +133,15 @@ namespace dae
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
 		{
-			//todo W3
-			throw std::runtime_error("Not Implemented Yet");
+			switch (light.type)
+			{
+				case LightType::Directional:
+					return light.color * light.intensity;
+				case LightType::Point:
+					return light.color * (light.intensity /
+						Vector3::Dot((light.origin - target), (light.origin - target)));
+				default: return{};
+			}
 			return {};
 		}
 	}
