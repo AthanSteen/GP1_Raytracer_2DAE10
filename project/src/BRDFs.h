@@ -31,9 +31,13 @@ namespace dae
 		 */
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
-			//todo: W3
-			throw std::runtime_error("Not Implemented Yet");
-			return {};
+			Vector3 r = l - 2 * (Vector3::Dot(n, l)) * n;
+
+			float cosAlpha = std::max(0.0f, Vector3::Dot(r, v));
+
+			float specularReflection = ks * pow(cosAlpha, exp);
+
+			return ColorRGB(specularReflection, specularReflection, specularReflection);
 		}
 
 		/**
@@ -45,9 +49,8 @@ namespace dae
 		 */
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
-			//todo: W3
-			throw std::runtime_error("Not Implemented Yet");
-			return {};
+			float cosTheta = std::max(0.0f, Vector3::Dot(v, h));
+			return f0 + (ColorRGB(1.0f, 1.0f, 1.0f) - f0) * pow(1.0f - cosTheta, 5.0f);
 		}
 
 		/**
@@ -59,9 +62,10 @@ namespace dae
 		 */
 		static float NormalDistribution_GGX(const Vector3& n, const Vector3& h, float roughness)
 		{
-			//todo: W3
-			throw std::runtime_error("Not Implemented Yet");
-			return {};
+			float roughnessSquared = roughness * roughness;
+			float dotNH = std::max(0.0f, Vector3::Dot(n, h));
+			float denominator = (dotNH * dotNH * (roughnessSquared - 1.0f) + 1.0f);
+			return roughnessSquared / (M_PI * denominator * denominator);
 		}
 
 
@@ -74,9 +78,9 @@ namespace dae
 		 */
 		static float GeometryFunction_SchlickGGX(const Vector3& n, const Vector3& v, float roughness)
 		{
-			//todo: W3
-			throw std::runtime_error("Not Implemented Yet");
-			return {};
+			float k = roughness * 0.5f;
+			float dotNV = std::max(0.0f, Vector3::Dot(n, v));
+			return dotNV / (dotNV * (1.0f - k) + k);
 		}
 
 		/**
@@ -89,9 +93,7 @@ namespace dae
 		 */
 		static float GeometryFunction_Smith(const Vector3& n, const Vector3& v, const Vector3& l, float roughness)
 		{
-			//todo: W3
-			throw std::runtime_error("Not Implemented Yet");
-			return {};
+			return GeometryFunction_SchlickGGX(n, v, roughness) * GeometryFunction_SchlickGGX(n, l, roughness);
 		}
 
 	}

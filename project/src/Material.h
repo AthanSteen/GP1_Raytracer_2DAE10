@@ -82,9 +82,8 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			//todo: W3
-			throw std::runtime_error("Not Implemented Yet");
-			return {};
+			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor)
+				+ BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, -v, hitRecord.normal);
 		}
 
 	private:
@@ -107,9 +106,25 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			//todo: W3
-			throw std::runtime_error("Not Implemented Yet");
-			return {};
+			ColorRGB F0 = (m_Metalness > 0.0f) ? m_Albedo : ColorRGB(0.04f, 0.04f, 0.04f);
+			Vector3 halfVector = (v + l).Normalized();
+
+			float dotNormalLight = std::max(0.0f, Vector3::Dot(hitRecord.normal, l));
+			float dotNormalView = std::max(0.0f, Vector3::Dot(hitRecord.normal, v));
+			float dotNormalHalf = std::max(0.0f, Vector3::Dot(hitRecord.normal, halfVector));
+			float dotViewHalf = std::max(0.0f, Vector3::Dot(v, halfVector));
+
+			ColorRGB fresnel = BRDF::FresnelFunction_Schlick(halfVector, v, F0);
+			float normalDistribution = BRDF::NormalDistribution_GGX(hitRecord.normal, halfVector, m_Roughness);
+			float geometry = BRDF::GeometryFunction_Smith(hitRecord.normal, v, l, m_Roughness);
+
+			ColorRGB specularReflection = (fresnel * normalDistribution * geometry) /
+				(4.0f * dotNormalLight * dotNormalView + FLT_EPSILON);
+
+			float diffuseWeight = (m_Metalness > 0.0f) ? 0.0f : 1.0f - fresnel.r;
+			ColorRGB diffuseReflection = diffuseWeight * dae::BRDF::Lambert(1.0f, m_Albedo);
+
+			return dotNormalLight * (diffuseReflection + specularReflection);
 		}
 
 	private:
