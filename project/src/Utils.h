@@ -88,9 +88,52 @@ namespace dae
 		//TRIANGLE HIT-TESTS
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W5
-			throw std::runtime_error("Not Implemented Yet");
-			return false;
+			float normalDotRayDir = Vector3::Dot(triangle.normal, ray.direction);
+
+			bool isFrontFacing = normalDotRayDir < 0;
+			switch (triangle.cullMode)
+			{
+			case TriangleCullMode::FrontFaceCulling:
+				if (isFrontFacing == !ignoreHitRecord) return false;
+				break;
+			case TriangleCullMode::BackFaceCulling:
+				if (isFrontFacing == ignoreHitRecord) return false;
+				break;
+			case TriangleCullMode::NoCulling:
+			default:
+				break;
+			}
+
+			if (std::abs(normalDotRayDir) < FLT_EPSILON) return false;
+
+			float d = Vector3::Dot(triangle.normal, triangle.v0);
+			float t = (d - Vector3::Dot(triangle.normal, ray.origin)) / normalDotRayDir;
+			if (t < ray.min || t > ray.max) return false;
+
+			Vector3 hitPoint = ray.origin + t * ray.direction;
+
+			Vector3 edge0 = triangle.v1 - triangle.v0;
+			Vector3 edge1 = triangle.v2 - triangle.v1;
+			Vector3 edge2 = triangle.v0 - triangle.v2;
+
+			Vector3 C0 = hitPoint - triangle.v0;
+			Vector3 C1 = hitPoint - triangle.v1;
+			Vector3 C2 = hitPoint - triangle.v2;
+
+			if (Vector3::Dot(triangle.normal, Vector3::Cross(edge0, C0)) < 0) return false;
+			if (Vector3::Dot(triangle.normal, Vector3::Cross(edge1, C1)) < 0) return false;
+			if (Vector3::Dot(triangle.normal, Vector3::Cross(edge2, C2)) < 0) return false;
+
+			if (!ignoreHitRecord)
+			{
+				hitRecord.didHit = true;
+				hitRecord.t = t; 
+				hitRecord.materialIndex = triangle.materialIndex;
+				hitRecord.origin = hitPoint;
+				hitRecord.normal = isFrontFacing ? triangle.normal : -triangle.normal;
+			}
+
+			return true;
 		}
 
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray)
@@ -102,9 +145,41 @@ namespace dae
 #pragma region TriangeMesh HitTest
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W5
-			throw std::runtime_error("Not Implemented Yet");
-			return false;
+			bool didHit = false;
+			float closestT = INFINITY;
+
+			for (size_t i{ 0 }; i < mesh.indices.size(); i += 3)
+			{
+				int index0 = mesh.indices[i];
+				int index1 = mesh.indices[i + 1];
+				int index2 = mesh.indices[i + 2];
+
+				Triangle triangle;
+				triangle.v0 = mesh.transformedPositions[index0];
+				triangle.v1 = mesh.transformedPositions[index1];
+				triangle.v2 = mesh.transformedPositions[index2];
+				triangle.normal = mesh.transformedNormals[i / 3];
+				triangle.cullMode = mesh.cullMode;
+				triangle.materialIndex = mesh.materialIndex;
+
+				HitRecord tempHitRecord;
+
+				if (HitTest_Triangle(triangle, ray, tempHitRecord, ignoreHitRecord))
+				{
+					if (tempHitRecord.t < closestT)
+					{
+						closestT = tempHitRecord.t;
+						didHit = true;
+
+						if (!ignoreHitRecord)
+						{
+							hitRecord = tempHitRecord;
+						}
+					}
+				}
+			}
+
+			return didHit;
 		}
 
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray)
