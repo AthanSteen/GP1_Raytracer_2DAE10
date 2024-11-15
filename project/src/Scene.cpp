@@ -200,9 +200,9 @@ void Scene_W4_ReferenceScene::Initialize()
 	m_Meshes[2]->UpdateAABB();
 	m_Meshes[2]->UpdateTransforms();
 
-	AddPointLight({ 0.f, 5.5f, 5.f }, 50.f, { 1.f, .61f, .45f }); // BackLight
-	AddPointLight({ -2.5f, 5.f, -5.f }, 70.f, { 1.f, .8f, .45f }); // Front Light Left
-	AddPointLight({ 2.5f, 5.f, -5.f }, 50.f, { .34f, .47f, .68f });
+	AddPointLight({ 0.f, 5.5f, 5.f }, 50.f, { 1.f, .61f, .45f });
+	AddPointLight({ -2.5f, 5.f, -5.f }, 70.f, { 1.f, .8f, .45f });
+	AddPointLight({ 2.5f, 2.5f, -5.f }, 50.f, { .34f, .47f, .68f });
 }
 
 void Scene_W4_ReferenceScene::Update(Timer* pTimer)
@@ -246,9 +246,9 @@ void Scene_W4_BunnyScene::Initialize()
 	pMesh->UpdateAABB();
 	pMesh->UpdateTransforms();
 
-	AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, ColorRGB{ 1.f, .61f, .45f });
-	AddPointLight(Vector3{ -2.5f, 5.f, -5.f }, 50.f, ColorRGB{ 1.f, .8f, .45f });
-	AddPointLight(Vector3{ 2.5f, 2.5f, -5.f }, 50.f, ColorRGB{ .34f, .47f, .68f });
+	AddPointLight({ 0.f, 5.5f, 5.f }, 50.f, { 1.f, .61f, .45f });
+	AddPointLight({ -2.5f, 5.f, -5.f }, 70.f, { 1.f, .8f, .45f });
+	AddPointLight({ 2.5f, 2.5f, -5.f }, 50.f, { .34f, .47f, .68f });
 }
 
 void Scene_W4_BunnyScene::Update(Timer* pTimer)
