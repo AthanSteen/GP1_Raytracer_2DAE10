@@ -348,16 +348,19 @@ void Scene_W4_ReferenceScene::Initialize()
 	m_Meshes[0] = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
 	m_Meshes[0]->AppendTriangle(baseTriangle, true);
 	m_Meshes[0]->Translate({ -1.75f, 4.5f, 0.f });
+	m_Meshes[0]->UpdateAABB();
 	m_Meshes[0]->UpdateTransforms();
 
 	m_Meshes[1] = AddTriangleMesh(TriangleCullMode::FrontFaceCulling, matLambert_White);
 	m_Meshes[1]->AppendTriangle(baseTriangle, true);
 	m_Meshes[1]->Translate({ 0.f, 4.5f, 0.f });
+	m_Meshes[1]->UpdateAABB();
 	m_Meshes[1]->UpdateTransforms();
 
 	m_Meshes[2] = AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
 	m_Meshes[2]->AppendTriangle(baseTriangle, true);
 	m_Meshes[2]->Translate({ 1.75f, 4.5f, 0.f });
+	m_Meshes[2]->UpdateAABB();
 	m_Meshes[2]->UpdateTransforms();
 
 	AddPointLight({ 0.f, 5.5f, 5.f }, 50.f, { 1.f, .61f, .45f }); // BackLight
@@ -403,7 +406,6 @@ void Scene_W4_BunnyScene::Initialize()
 		pMesh->indices);
 
 	pMesh->Scale({ 2.f, 2.f, 2.f });
-	//pMesh->Translate({ .0f, 1.f, .0f });
 
 	pMesh->UpdateTransforms();
 
