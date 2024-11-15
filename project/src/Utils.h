@@ -192,18 +192,16 @@ namespace dae
 				triangle.cullMode = mesh.cullMode;
 				triangle.materialIndex = mesh.materialIndex;
 
-				HitRecord tempHitRecord;
-
-				if (HitTest_Triangle(triangle, ray, tempHitRecord, ignoreHitRecord))
+				if (HitTest_Triangle(triangle, ray, hitRecord, ignoreHitRecord))
 				{
-					if (tempHitRecord.t < closestT)
+					if (hitRecord.t < closestT)
 					{
-						closestT = tempHitRecord.t;
+						closestT = hitRecord.t;
 						didHit = true;
 
 						if (!ignoreHitRecord)
 						{
-							hitRecord = tempHitRecord;
+							hitRecord = hitRecord;
 						}
 					}
 				}

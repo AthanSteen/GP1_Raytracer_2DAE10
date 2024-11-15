@@ -64,69 +64,7 @@ namespace dae
 	};
 
 	//+++++++++++++++++++++++++++++++++++++++++
-	///WEEK 1 Test Scene
-	//class Scene_W1 final : public Scene
-	//{
-	//public:
-	//	Scene_W1() = default;
-	//	~Scene_W1() override = default;
-	//
-	//	Scene_W1(const Scene_W1&) = delete;
-	//	Scene_W1(Scene_W1&&) noexcept = delete;
-	//	Scene_W1& operator=(const Scene_W1&) = delete;
-	//	Scene_W1& operator=(Scene_W1&&) noexcept = delete;
-	//
-	//	void Initialize() override;
-	//};
-
-	///WEEK 2 Test Scene
-	//class Scene_W2 final : public Scene
-	//{
-	//public:
-	//	Scene_W2() = default;
-	//	~Scene_W2() override = default;
-	//
-	//	Scene_W2(const Scene_W2&) = delete;
-	//	Scene_W2(Scene_W2&&) noexcept = delete;
-	//	Scene_W2& operator=(const Scene_W2&) = delete;
-	//	Scene_W2& operator=(Scene_W2&&) noexcept = delete;
-	//
-	//	void Initialize() override;
-	//};
-
-	///WEEK 3 Test Scene
-	//class Scene_W3 final : public Scene
-	//{
-	//public:
-	//	Scene_W3() = default;
-	//	~Scene_W3() override = default;
-	//
-	//	Scene_W3(const Scene_W3&) = delete;
-	//	Scene_W3(Scene_W3&&) noexcept = delete;
-	//	Scene_W3& operator=(const Scene_W3&) = delete;
-	//	Scene_W3& operator=(Scene_W3&&) noexcept = delete;
-	//
-	//	void Initialize() override;
-	//};
-
-	///WEEK 4 Test Scene
-	class Scene_W4 final : public Scene
-	{
-	public:
-		Scene_W4() = default;
-		~Scene_W4() override = default;
 	
-		Scene_W4(const Scene_W4&) = delete;
-		Scene_W4(Scene_W4&&) noexcept = delete;
-		Scene_W4& operator=(const Scene_W4&) = delete;
-		Scene_W4& operator=(Scene_W4&&) noexcept = delete;
-	
-		void Initialize() override;
-		void Update(Timer* pTimer) override;
-	private:
-		TriangleMesh* pMesh{ nullptr };
-	};
-
 	class Scene_W4_ReferenceScene final : public Scene
 	{
 	public:
