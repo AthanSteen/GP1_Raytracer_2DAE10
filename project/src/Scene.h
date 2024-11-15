@@ -21,7 +21,7 @@ namespace dae
 	public:
 		Scene();
 		virtual ~Scene();
-
+		
 		Scene(const Scene&) = delete;
 		Scene(Scene&&) noexcept = delete;
 		Scene& operator=(const Scene&) = delete;
@@ -32,6 +32,7 @@ namespace dae
 		{
 			m_Camera.Update(pTimer);
 		}
+		virtual void Clear();
 
 		Camera& GetCamera() { return m_Camera; }
 		void GetClosestHit(const Ray& ray, HitRecord& closestHit) const;

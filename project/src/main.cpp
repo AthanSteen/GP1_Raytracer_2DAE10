@@ -47,12 +47,13 @@ int main(int argc, char* args[])
 	const auto pTimer = new Timer();
 	const auto pRenderer = new Renderer(pWindow);
 
-	//const auto pScene = new Scene_W1();
-	//const auto pScene = new Scene_W2();
-	//const auto pScene = new Scene_W3();
-	//const auto pScene = new Scene_W4();
-	const auto pScene = new Scene_W4_ReferenceScene();
-	//const auto pScene = new Scene_W4_BunnyScene();
+	std::vector<Scene*> scenes = {
+		new Scene_W4_ReferenceScene(),
+		new Scene_W4_BunnyScene()
+	};
+	int currentSceneIndex{ 1 };
+	Scene* pScene = scenes[currentSceneIndex];
+
 	pScene->Initialize();
 
 	//Start loop
@@ -68,6 +69,7 @@ int main(int argc, char* args[])
 	{
 		//--------- Get input events ---------
 		SDL_Event e;
+
 		while (SDL_PollEvent(&e))
 		{
 			switch (e.type)
@@ -78,6 +80,15 @@ int main(int argc, char* args[])
 			case SDL_KEYUP:
 				if (e.key.keysym.scancode == SDL_SCANCODE_X)
 					takeScreenshot = true;
+				if (e.key.keysym.scancode == SDL_SCANCODE_TAB)
+				{
+					pScene->Clear();
+
+					currentSceneIndex = (currentSceneIndex + 1) % scenes.size();
+
+					pScene = scenes[currentSceneIndex];
+					pScene->Initialize();
+				}
 				break;
 			}
 		}
@@ -110,7 +121,12 @@ int main(int argc, char* args[])
 	pTimer->Stop();
 
 	//Shutdown "framework"
-	delete pScene;
+
+	for (auto& scene : scenes)
+	{
+		delete scene;
+	}
+
 	delete pRenderer;
 	delete pTimer;
 

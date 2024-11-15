@@ -59,7 +59,7 @@ namespace dae
 	{
 		TriangleMesh() = default;
 		TriangleMesh(const std::vector<Vector3>& _positions, const std::vector<int>& _indices, TriangleCullMode _cullMode) :
-			positions(_positions), indices(_indices), cullMode(_cullMode)
+			positions(std::move(_positions)), indices(std::move(_indices)), cullMode(_cullMode)
 		{
 			CalculateNormals();
 			UpdateTransforms();
@@ -109,6 +109,10 @@ namespace dae
 		void AppendTriangle(const Triangle& triangle, bool ignoreTransformUpdate = false)
 		{
 			int startIndex = static_cast<int>(positions.size());
+
+			positions.reserve(positions.size() + 3);
+			indices.reserve(indices.size() + 3);
+			normals.reserve(normals.size() + 1);
 
 			positions.emplace_back(triangle.v0);
 			positions.emplace_back(triangle.v1);
@@ -195,33 +199,19 @@ namespace dae
 			Vector3 tMinAABB = finalTransform.TransformPoint(minAABB);
 			Vector3 tMaxAABB = tMinAABB;
 
-			Vector3 tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, minAABB.z);
-			tMinAABB = Vector3::Min(tAABB, tMinAABB);
-			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			const std::vector<Vector3> corners = {
+				{minAABB.x, minAABB.y, minAABB.z}, {maxAABB.x, minAABB.y, minAABB.z},
+				{maxAABB.x, minAABB.y, maxAABB.z}, {minAABB.x, minAABB.y, maxAABB.z},
+				{minAABB.x, maxAABB.y, minAABB.z}, {maxAABB.x, maxAABB.y, minAABB.z},
+				{maxAABB.x, maxAABB.y, maxAABB.z}, {minAABB.x, maxAABB.y, maxAABB.z}
+			};
 
-			tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, maxAABB.z);
-			tMinAABB = Vector3::Min(tAABB, tMinAABB);
-			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
-
-			tAABB = finalTransform.TransformPoint(minAABB.x, minAABB.y, maxAABB.z);
-			tMinAABB = Vector3::Min(tAABB, tMinAABB);
-			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
-
-			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, minAABB.z);
-			tMinAABB = Vector3::Min(tAABB, tMinAABB);
-			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
-
-			tAABB = finalTransform.TransformPoint(maxAABB.x, maxAABB.y, minAABB.z);
-			tMinAABB = Vector3::Min(tAABB, tMinAABB);
-			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
-
-			tAABB = finalTransform.TransformPoint(maxAABB);
-			tMinAABB = Vector3::Min(tAABB, tMinAABB);
-			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
-
-			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, maxAABB.z);
-			tMinAABB = Vector3::Min(tAABB, tMinAABB);
-			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			for (const auto& corner : corners)
+			{
+				const Vector3 tAABB = finalTransform.TransformPoint(corner);
+				tMinAABB = Vector3::Min(tAABB, tMinAABB);
+				tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			}
 
 			transformedMinAABB = tMinAABB;
 			transformedMaxAABB = tMaxAABB;
