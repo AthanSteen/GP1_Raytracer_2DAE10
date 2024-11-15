@@ -22,6 +22,12 @@ void ShutDown(SDL_Window* pWindow)
 	SDL_Quit();
 }
 
+void SetScene(SDL_Window* pWindow, Scene* pScene)
+{
+	pScene->Initialize();
+	SDL_SetWindowTitle(pWindow, ("Raytracer: " + pScene->GetTitle() + " - Athan Van den Steen 2GD10E").c_str());
+}
+
 int main(int argc, char* args[])
 {
 	//Unreferenced parameters
@@ -51,10 +57,10 @@ int main(int argc, char* args[])
 		new Scene_W4_ReferenceScene(),
 		new Scene_W4_BunnyScene()
 	};
-	int currentSceneIndex{ 1 };
-	Scene* pScene = scenes[currentSceneIndex];
+	int currentSceneIndex{ 0 };
 
-	pScene->Initialize();
+	Scene* pScene = scenes[currentSceneIndex];
+	SetScene(pWindow, pScene);
 
 	//Start loop
 	pTimer->Start();
@@ -65,6 +71,9 @@ int main(int argc, char* args[])
 	float printTimer = 0.f;
 	bool isLooping = true;
 	bool takeScreenshot = false;
+
+	std::cout << "Press 'TAB' to change scenes!\n";
+
 	while (isLooping)
 	{
 		//--------- Get input events ---------
@@ -87,7 +96,7 @@ int main(int argc, char* args[])
 					currentSceneIndex = (currentSceneIndex + 1) % scenes.size();
 
 					pScene = scenes[currentSceneIndex];
-					pScene->Initialize();
+					SetScene(pWindow, pScene);
 				}
 				break;
 			}
